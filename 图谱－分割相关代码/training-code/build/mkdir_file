@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+mkdir training
+mkdir REG_UAB
+mkdir REG_UAB/tmp
+mkdir REG_UAB/tmp2
+
+

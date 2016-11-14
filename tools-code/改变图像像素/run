@@ -1,0 +1,8 @@
+#!/bin/bash
+#./main 48 50 label-255/a_01_ _spleen.png label/a_01_
+#./main 51 53 label-255/a_01_ _spleen.png label/a_01_
+#./main 54 56 label-255/a_01_ _spleen.png label/a_01_
+for((a=61;a<=121;a++))
+do
+./main $a $a label-255/a_01_ _spleen.png label/a_01_
+done

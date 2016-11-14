@@ -1,0 +1,17 @@
+#!/bin/bash
+
+ 
+ 
+mkdir MAS
+mkdir MAS/tmp
+mkdir MAS/tmp2
+mkdir ori
+mkdir training
+ 
+ 
+ 
+ 
+
+ 
+
+ 

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+ 
+ 
+for ((a=0; a <= 29; a++))
+do
+ 
+ #./transformix -out  exampleoutput -tp  Affine_Iter0_$a.txt -in  liver-0.nrrd
+ 
+ #mv  exampleoutput/result.nrrd  exampleoutput/liver-AFFINE1toothers_$a.nrrd 
+ 
+ 
+ 
+ cp Affine_Iter3_$a.txt REG_UAB/tmp/TransformParameters.0.txt
+ 
+  ./transformix -out  exampleoutput -tp  BSpline_Iter3_$a.txt -in  liver-$a.nrrd
+ 
+ mv  exampleoutput/result.nrrd  exampleoutput/liver-BSplinetomean_$a.nrrd
+ 
+ 
+      echo 
+done
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+
+ 
