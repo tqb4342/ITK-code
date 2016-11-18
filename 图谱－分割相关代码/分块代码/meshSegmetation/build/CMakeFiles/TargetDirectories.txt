@@ -1,0 +1,1 @@
+/home/ivan/src/meshSegmetation/build/CMakeFiles/main.dir

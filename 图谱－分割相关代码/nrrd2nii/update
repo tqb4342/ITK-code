@@ -1,0 +1,17 @@
+#!/bin/bash
+
+ 
+
+
+
+for ((a=0; a <= 11; a++))
+do
+    ./nrrd2nii liver-$a.nrrd spleen-$a.nii
+done
+ 
+
+
+
+ 
+
+ 

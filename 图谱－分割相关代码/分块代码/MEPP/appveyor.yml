@@ -1,0 +1,100 @@
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+#
+
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+# Operating system (build VM template)
+os: Visual Studio 2015
+
+# environment variables
+environment:
+  QT5_DIR: C:\Qt\5.6\msvc2015_64
+#
+  KIT_ROOT: C:\\local_vs2015_64 # why \\ for Qt4 ? !
+#
+  matrix:
+  - B_USE_QT5:  OFF  # so we use Qt4 here for UI
+  - B_USE_QT5:  ON
+
+# this is how to allow failing jobs in the matrix
+matrix:
+  fast_finish: true # set this flag to immediately finish build once one of the jobs fails
+#  allow_failures:
+
+# build cache to preserve files/folders between builds
+#cache:
+# - %KIT_ROOT% # don't work !?
+#  - C:\local_vs2015_64 # cached folder size cannot exceed 500 MB, so OFF for the moment...
+
+# scripts that are called at very beginning, before repo cloning
+init:
+#  - set
+#  - msbuild /version
+#  - cmake --version
+#  - dir C:\Libraries
+#  - dir C:\Libraries\boost_1_59_0
+#  - dir C:\Qt
+#  - dir C:\Qt\5.6
+  - C:\Qt\5.6\msvc2015_64\bin\qmake --version
+  - set APPVEYOR=TRUE
+  - set CACHE=FALSE
+
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
+# build Configuration, i.e. Debug, Release, etc
+configuration:
+  - Release
+  - Debug
+
+# MSBuild verbosity level
+#  verbosity: quiet|minimal|normal|detailed
+
+# scripts to run before build
+before_build:
+#  - IF %CACHE%==FALSE rmdir /s %KIT_ROOT% /Q # uncomment only once if new library
+  - IF EXIST %KIT_ROOT% SET CACHE=TRUE
+#
+  - echo %CACHE%
+  - IF %CACHE%==FALSE echo CACHE_IS_FALSE
+  - IF %CACHE%==TRUE echo CACHE_IS_TRUE
+#
+  - IF %CACHE%==FALSE mkdir %KIT_ROOT%
+  - IF %CACHE%==FALSE cd %KIT_ROOT%
+# boost
+  - ren C:\Libraries\boost_1_59_0\lib64-msvc-14.0 lib
+# CGAL
+  - IF %CACHE%==FALSE curl --connect-timeout 60 --max-time 600 -s -O https://download.gforge.liris.cnrs.fr/meppbin/windows/vs2015/MEPP/packages/clean/CGAL-4.7__boost-1.59.0-AppVeyor_V3.7z
+  - IF %CACHE%==FALSE 7z x CGAL-4.7__boost-1.59.0-AppVeyor_V3.7z > nul
+# Qt4
+  - IF %CACHE%==FALSE curl --connect-timeout 60 --max-time 600 -s -O https://download.gforge.liris.cnrs.fr/meppbin/windows/vs2015/MEPP/packages/clean/qt-4.8.7-x64-msvc2015.7z
+  - IF %CACHE%==FALSE 7z x qt-4.8.7-x64-msvc2015.7z > nul
+# libQGLViewer (for Qt 4.8.7)
+  - IF %CACHE%==FALSE curl --connect-timeout 60 --max-time 600 -s -O https://download.gforge.liris.cnrs.fr/meppbin/windows/vs2015/MEPP/packages/clean/libQGLViewer-2.6.3-qt-4.8.7.rar
+  - IF %CACHE%==FALSE 7z x libQGLViewer-2.6.3-qt-4.8.7.rar > nul
+# libQGLViewer (for Qt 5.6.0)
+  - IF %CACHE%==FALSE curl --connect-timeout 60 --max-time 600 -s -O https://download.gforge.liris.cnrs.fr/meppbin/windows/vs2015/MEPP/packages/clean/libQGLViewer-2.6.3-qt-5.6.0.rar
+  - IF %CACHE%==FALSE 7z x libQGLViewer-2.6.3-qt-5.6.0.rar > nul
+# xerces-c
+  - IF %CACHE%==FALSE curl --connect-timeout 60 --max-time 600 -s -O https://download.gforge.liris.cnrs.fr/meppbin/windows/vs2015/MEPP/packages/redo/xerces-c-3.1.2.rar
+  - IF %CACHE%==FALSE 7z x xerces-c-3.1.2.rar > nul
+# assimp
+  - IF %CACHE%==FALSE curl --connect-timeout 60 --max-time 600 -s -O https://download.gforge.liris.cnrs.fr/meppbin/windows/vs2015/MEPP/packages/redo/assimp-3.2.rar
+  - IF %CACHE%==FALSE 7z x assimp-3.2.rar > nul
+# ffmpeg
+  - IF %CACHE%==FALSE curl --connect-timeout 60 --max-time 600 -s -O https://download.gforge.liris.cnrs.fr/meppbin/windows/vs2015/MEPP/packages/clean/contrib.rar
+  - IF %CACHE%==FALSE 7z x contrib.rar > nul
+#
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - cmake . -G"Visual Studio 14 2015 Win64" -DMSVC_KIT_ROOT=%KIT_ROOT% -DWITH_QT5=%B_USE_QT5%
+
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+  - msbuild /m MEPP.sln
+#  - msbuild MEPP.sln # /m IS responsible for random crashes of Qt MOC !!!

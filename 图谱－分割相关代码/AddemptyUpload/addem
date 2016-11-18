@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+ 
+./main 0.nrrd 0-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-61-flip.nrrd 84 138
+./main 1.nrrd 1-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-62-flip.nrrd 47 90
+./main 2.nrrd 2-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-63-flip.nrrd 44 95
+./main 3.nrrd 3-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-64-flip.nrrd 1 159
+./main 4.nrrd 4-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-65-flip.nrrd 89 152
+
+./main 5.nrrd 5-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-66-flip.nrrd 91 171
+./main 6.nrrd 6-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-67-flip.nrrd 97 173
+./main 7.nrrd 7-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-68-flip.nrrd 47 86
+./main 8.nrrd 8-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-69-flip.nrrd 57 97
+./main 9.nrrd 9-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-70-flip.nrrd 63 120
+
+./main 10.nrrd 10-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-71-flip.nrrd 66 110
+./main 11.nrrd 11-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-72-flip.nrrd 80 152
+./main 12.nrrd 12-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-73-flip.nrrd 85 130
+./main 13.nrrd 13-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-74-flip.nrrd 45 86
+./main 14.nrrd 14-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-75-flip.nrrd 48 93
+
+./main 15.nrrd 15-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-76-flip.nrrd 36 113
+./main 16.nrrd 16-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-77-flip.nrrd 80 151
+./main 17.nrrd 17-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-78-flip.nrrd 52 89
+./main 18.nrrd 18-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-79-flip.nrrd 44 87
+./main 19.nrrd 19-addem.nrrd /home/ivan/Downloads/RawData/Tesing-F/ori/img-80-flip.nrrd 54 95
+ 
+
+
+ 
+ 
