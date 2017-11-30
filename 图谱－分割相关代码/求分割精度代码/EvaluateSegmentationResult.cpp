@@ -240,12 +240,21 @@ int main(int argc, char* argv[])
 //	   avgDistance, avgSqrDistance, maxDistance,
 //	   tanimotoError );
 
-
+  //求dice
+  double jiError = (100.0 - tanimotoError)/100.0;
+  double diceError = 2 * jiError/(1 + jiError) * 100;
 
 //将求出来的精度写到evaluation.txt文件中
-  sprintf( resultBuffer, "%s; %s; JI:\t %.4f; ASD:\t %.4f\n", 
+ // sprintf( resultBuffer, "%s; %s; JI:\t %.4f; ASD:\t %.4f\n", 
 	   resultFilename, referenceFilename,
 	   100-tanimotoError, avgDistance );
+	
+	//  sprintf( resultBuffer, "%s; %s; Dice:\t %.4f; ASD:\t %.4f\n", 
+//	   resultFilename, referenceFilename,
+//	   diceError, avgDistance );
+	
+	sprintf( resultBuffer, "%s\t Dice:\t %.4f\tASD:\t %.4f\n", 
+	  resultFilename,diceError, avgDistance );
 
  // append info to specified text file:
   FILE *file = fopen( evaluationName.c_str(), "a" );
@@ -254,7 +263,8 @@ int main(int argc, char* argv[])
 
 //JI代表重叠率    ASD代表程序分割和手动标记之间的距离
 	printf("%s\t和\t%s 的重叠率与距离如下：\n",resultFilename,referenceFilename);
-	printf("JI:\t%f ASD:\t%f\n",100-tanimotoError,avgDistance);
+	//printf("JI:\t%f ASD:\t%f\n",100-tanimotoError,avgDistance);
+	printf("dice:\t%f ASD:\t%f\n",diceError,avgDistance);
 
 
 
