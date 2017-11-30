@@ -23,7 +23,7 @@ using namespace Eigen;
 
 
 
-#define N 4
+#define N 15
 
 
 bool getShapeVariationVertex();
@@ -40,15 +40,14 @@ int main(int argc, char * argv[])
 //------------------------------------------------------------------------------------
 //    Get file "shapeVariation_Vertex.csv" from training data.	
 //------------------------------------------------------------------------------------	
-	getShapeVariationVertex();	
-
+	//getShapeVariationVertex();	//n组数据对应点到中心距离的标准差，保存在shapeVariation_Vertex.csv
 //------------------------------------------------------------------------------------
 //    Get "shapeVariation_Face.csv" from file "shapeVariation_Vertex.csv".
 //    "shapeVariation_Face.csv" is used in MEPP to segment meshes.
 //    ""shapeVariation_Vertex.csv"" is from the output of *ASM*.
 //------------------------------------------------------------------------------------	
-	shapeVariationVertex2Face();
-	return 0;
+	//shapeVariationVertex2Face();   //每个面对应的顶点到中心距离的标准差的和的平均，保存在shapeVariation_Face.csv
+	//return 0;
 	
 	
 	
@@ -119,10 +118,11 @@ bool getShapeVariationVertex()
 	int cols = 0;// = 9;//3*3;  // 3k	
 	
 	// Open the OFF files.
-    char *baseName = "training/liver-";
+    char *baseName = "training/spleen-";
 	int numSuccessFile;	
-	MatrixXf X0;  // The Data Matrix.
-	bool readFlag = readTrainingData( X0, baseName, N2, cols, numSuccessFile );
+	MatrixXf X0;  // The Data Matrix.一个动态大小的矩阵
+	//把所有的训练数据都读到了矩阵X0中
+	bool readFlag = readTrainingData( X0, baseName, N2, cols, numSuccessFile );  
 	cout << "\np = " << cols << endl;
 	
 	if( false == readFlag )
@@ -227,10 +227,10 @@ bool calculateWeights( MatrixXf X, VectorXf& W)
 
 	
 	// Compute Weight for every point.	
-	RowVectorXf muDist = centroidDist.colwise().mean();
-	MatrixXf centroidDist2 = centroidDist.rowwise() - muDist;	
+	RowVectorXf muDist = centroidDist.colwise().mean();  //所有样本到中心的距离求平均得到平均距离
+	MatrixXf centroidDist2 = centroidDist.rowwise() - muDist;	//所有样本到中心的距离减去平均距离
 	//cout << "\n\ncentroidDist( After centered ):\t\n" <<endl << centroidDist2 << endl;	
-	RowVectorXf rDiff = centroidDist2.colwise().squaredNorm();
+	RowVectorXf rDiff = centroidDist2.colwise().squaredNorm();//n组数据对应点到中心距离的方差
 	//cout << "\n\nrDiff:\n" << rDiff <<endl <<endl;
 	
 	
@@ -251,7 +251,7 @@ bool calculateWeights( MatrixXf X, VectorXf& W)
 		
 	    for( int i=0; i<numPoints; i++ )
 	    {
-			rVariance = sqrt( rDiff[i]/(double)( numSamples-1 ) );
+			rVariance = sqrt( rDiff[i]/(double)( numSamples-1 ) );  //n组数据对应点到中心距离的标准差
 	        //cout << "\nrVariance:\t" << rVariance <<endl <<endl;	
 			ofs << rVariance << endl;
 		    //printf("%f\n", rVariance);	
@@ -381,9 +381,9 @@ bool shapeVariationVertex2Face()
 // II. Tag ALL the Faces.
 //------------------------------------------------------------------------------------	
     DCELMesh *myMesh = new DCELMesh();	
-	DCELTools::loadFromOFF( "meanShape_liver.off", myMesh );
-	int numVertices = myMesh->getNumVertices();
-	int numFaces = myMesh->getNumFaces();
+	DCELTools::loadFromOFF( "meanShape_spleen.off", myMesh );
+	int numVertices = myMesh->getNumVertices();   //顶点个数
+	int numFaces = myMesh->getNumFaces();         //面的个数
 	
 	int counter = 0;	
 	for( DCELVertex*  vWalker=myMesh->firstVertex(); vWalker; myMesh->advance(vWalker) ) 
@@ -518,7 +518,7 @@ if( !SEGED )
 // II. Tag ALL the Faces.
 //------------------------------------------------------------------------------------	
     DCELMesh *myMesh = new DCELMesh();	
-	DCELTools::loadFromOFF( "meanShape_liver.off", myMesh );
+	DCELTools::loadFromOFF( "meanShape_spleen.off", myMesh );
 	int numVertices = myMesh->getNumVertices();
 	
 	int counter = 0;	
@@ -771,7 +771,7 @@ else
 //------------------------------------------------------------------------------------
 // II. Get the Seg Info for each training file.
 //------------------------------------------------------------------------------------		
-    for( int i=0; i<50; i++ )
+    for( int i=0; i<5; i++ )
 	{
 	//--------------------------------------------
 	// Get the Seg Info for this training file.
@@ -779,7 +779,7 @@ else
 		ostringstream ss;
 	    string datasetFilename;
 		
-		ss << "data/liver-" << i << ".off";
+		ss << "data/spleen-" << i << ".off";
 	    datasetFilename = ss.str();
 		char *inputFile = new char[datasetFilename.size()+1];
 		strcpy( inputFile, datasetFilename.c_str() );
@@ -925,7 +925,7 @@ bool segInfoFaceViz()
 // II. Tag ALL the Faces.
 //------------------------------------------------------------------------------------	
     DCELMesh *myMesh = new DCELMesh();	
-	DCELTools::loadFromOFF( "meanShape_liver.off", myMesh );
+	DCELTools::loadFromOFF( "meanShape_spleen.off", myMesh );
 	int numVertices = myMesh->getNumVertices();
 	int numFaces = myMesh->getNumFaces();
 	
@@ -1019,7 +1019,7 @@ bool segInfoFaceViz()
 //------------------------------------------------------------------------------------
 // II. Get the Seg Info for each training file.
 //------------------------------------------------------------------------------------		
-    for( int i=0; i<50; i++ )
+    for( int i=0; i<5; i++ )
 	{
 	//--------------------------------------------
 	// Get the Seg Info for this training file.
@@ -1027,7 +1027,7 @@ bool segInfoFaceViz()
 		ostringstream ss;
 	    string datasetFilename;
 		
-		ss << "data/liver-" << i << ".off";
+		ss << "data/spleen-" << i << ".off";
 	    datasetFilename = ss.str();
 		char *inputFile = new char[datasetFilename.size()+1];
 		strcpy( inputFile, datasetFilename.c_str() );
