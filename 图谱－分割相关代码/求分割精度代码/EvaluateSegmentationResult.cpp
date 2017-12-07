@@ -11,18 +11,18 @@
 
 
 
-typedef itk::Image<unsigned char, 3>                      SegmentationType;
-typedef SegmentationType::Pointer                         SegmentationPointer;
-typedef itk::ImageFileReader< SegmentationType >          SegmentationReaderType;
-typedef itk::ImageRegionIterator<SegmentationType>        IteratorType;
-typedef itk::BinaryBallStructuringElement<char, 3>        StructuringType;
+typedef itk::Image<unsigned char, 3>                      SegmentationType;   //3维二值image type
+typedef SegmentationType::Pointer                         SegmentationPointer;  //3维二值image type Pointer
+typedef itk::ImageFileReader< SegmentationType >          SegmentationReaderType; //读取数据
+typedef itk::ImageRegionIterator<SegmentationType>        IteratorType;  //逐像素浏览图像数据的迭代器
+typedef itk::BinaryBallStructuringElement<char, 3>        StructuringType; //用作形态学图像过滤器的结构元素
 typedef itk::BinaryErodeImageFilter<SegmentationType, 
-  SegmentationType, StructuringType>                      ErodeFilterType;
+  SegmentationType, StructuringType>                      ErodeFilterType; //是二进制侵蚀形态学操作
 typedef itk::BinaryThresholdImageFilter< SegmentationType,
-  SegmentationType>                                       ThreshFilterType;
+  SegmentationType>                                       ThreshFilterType;  //通过阈值来调整输入图像
 typedef itk::SubtractImageFilter<SegmentationType, 
-  SegmentationType, SegmentationType>                     SubFilterType;
-typedef itk::Point<float,3>                               PointType;
+  SegmentationType, SegmentationType>                     SubFilterType;  //两幅图像像素相减
+typedef itk::Point<float,3>                               PointType;  //在n维空间中保存几何点的模板类
 
 
 //第一个参数是程序分割的数据，第二个参数是手动分割的数据
@@ -69,13 +69,13 @@ int main(int argc, char* argv[])
   }
   
   // initialisation
-  SegmentationReaderType::Pointer resultReader = SegmentationReaderType::New();
-  SegmentationReaderType::Pointer validationReader = SegmentationReaderType::New();
-  SegmentationPointer resultImage = resultReader->GetOutput();
-  SegmentationPointer validationImage = validationReader->GetOutput();
+  SegmentationReaderType::Pointer resultReader = SegmentationReaderType::New();  //定义读取图谱数据对象
+  SegmentationReaderType::Pointer validationReader = SegmentationReaderType::New(); //定义读取金标准数据对象
+  SegmentationPointer resultImage = resultReader->GetOutput(); //
+  SegmentationPointer validationImage = validationReader->GetOutput();//
   StructuringType structuringBall;
-  structuringBall.SetRadius( 1 );
-  structuringBall.CreateStructuringElement();
+  structuringBall.SetRadius( 1 ); //使用 SetRadius( ) 方式来定义和构造成员相关的邻域半径
+  structuringBall.CreateStructuringElement(); //调用CreateStructuringElement( ) 方式以便于初始化操作符。
   ThreshFilterType::Pointer threshFilter1 = ThreshFilterType::New();
   threshFilter1->SetLowerThreshold(1);
   threshFilter1->SetUpperThreshold(255);
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
     printf( "Could not load image %s\n", referenceFilename );
     return -2;
   }
-  // check if images have the same size
+  // check if images have the same size 检查图像的尺寸是否一样
   SegmentationType::RegionType resRegion = resultImage->GetLargestPossibleRegion();
   SegmentationType::RegionType valRegion = validationImage->GetLargestPossibleRegion();
   if (resRegion.GetSize() != valRegion.GetSize())
@@ -147,20 +147,20 @@ int main(int argc, char* argv[])
   subFilter1->UpdateLargestPossibleRegion();
   SegmentationPointer borderImg1 = subFilter1->GetOutput();
   IteratorType it1( borderImg1, borderImg1->GetLargestPossibleRegion() );
-  unsigned int numBorderPts1 = 0;
+  unsigned int numBorderPts1 = 0;  //3维图像，边界大于0的像素值个数
   for ( it1.GoToBegin(); !it1.IsAtEnd(); ++it1 ) {
     if (it1.Get() != 0) numBorderPts1++;
   }
-  ANNpointArray borderPts1 = annAllocPts( numBorderPts1, 3 );
-  numBorderPts1 = 0;
+  ANNpointArray borderPts1 = annAllocPts( numBorderPts1, 3 );  //空间坐标数组
+  numBorderPts1 = 0;   //减法后图像像素点的个数
   for ( it1.GoToBegin(); !it1.IsAtEnd(); ++it1 ) {
     if (it1.Get() != 0) {
       validationImage->TransformIndexToPhysicalPoint( it1.GetIndex(), pnt );
-      for (int d=0; d<3; d++) borderPts1[numBorderPts1][d] = pnt[d];
+      for (int d=0; d<3; d++) borderPts1[numBorderPts1][d] = pnt[d];   //分割图像的点存在该数组
       numBorderPts1++;
     }
   }
-  ANNkd_tree *borderTree1 = new ANNkd_tree( borderPts1, numBorderPts1, 3 );
+  ANNpointArray *borderTree1 = new ANNkd_tree( borderPts1, numBorderPts1, 3 );
 
   // compute border pixels and init kd-tree for image 2
   threshFilter2->SetInput( validationImage );
@@ -176,14 +176,14 @@ int main(int argc, char* argv[])
   numBorderPts2 = 0;
   for ( it2.GoToBegin(); !it2.IsAtEnd(); ++it2 ) {
     if (it2.Get() != 0) {
-      validationImage->TransformIndexToPhysicalPoint( it2.GetIndex(), pnt );
+      validationImage->TransformIndexToPhysicalPoint( it2.GetIndex(), pnt );   //将像素数组中的Index转换为物理空间中的坐标。
       for (int d=0; d<3; d++) borderPts2[numBorderPts2][d] = pnt[d];
       numBorderPts2++;
     }
   }
   ANNkd_tree *borderTree2 = new ANNkd_tree( borderPts2, numBorderPts2, 3 );
   
-  // calculate surface distance measures
+  // calculate surface distance measures 计算表面距离
   double avgDistance = 0;
   double avgSqrDistance = 0;
   double maxDistance = 0;
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
   for(unsigned int idx1=0; idx1<numBorderPts1; idx1++) {
     borderTree2->annkSearch( borderPts1[idx1], 1, nnIdx, dists);
     avgSqrDistance += dists[0];
-    double d = sqrt( dists[0] );
+    double d = sqrt( dists[0] ); //分割结果到金标准的最小欧式距离
     avgDistance += d;
     if (d>maxDistance) maxDistance = d;
   }
@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
   for(unsigned int idx2=0; idx2<numBorderPts2; idx2++) {
     borderTree1->annkSearch( borderPts2[idx2], 1, nnIdx, dists);
     avgSqrDistance += dists[0];
-    double d = sqrt( dists[0] );
+    double d = sqrt( dists[0] );  //金标准到分割结果的最小欧式距离
     avgDistance += d;
     if (d>maxDistance) maxDistance = d;
   }
@@ -240,19 +240,17 @@ int main(int argc, char* argv[])
 //	   avgDistance, avgSqrDistance, maxDistance,
 //	   tanimotoError );
 
+
   //求dice
   double jiError = (100.0 - tanimotoError)/100.0;
   double diceError = 2 * jiError/(1 + jiError) * 100;
 
+
 //将求出来的精度写到evaluation.txt文件中
- // sprintf( resultBuffer, "%s; %s; JI:\t %.4f; ASD:\t %.4f\n", 
-	   resultFilename, referenceFilename,
-	   100-tanimotoError, avgDistance );
-	
-	//  sprintf( resultBuffer, "%s; %s; Dice:\t %.4f; ASD:\t %.4f\n", 
+//  sprintf( resultBuffer, "%s; %s; Dice:\t %.4f; ASD:\t %.4f\n", 
 //	   resultFilename, referenceFilename,
 //	   diceError, avgDistance );
-	
+
 	sprintf( resultBuffer, "%s\t Dice:\t %.4f\tASD:\t %.4f\n", 
 	  resultFilename,diceError, avgDistance );
 
@@ -265,7 +263,6 @@ int main(int argc, char* argv[])
 	printf("%s\t和\t%s 的重叠率与距离如下：\n",resultFilename,referenceFilename);
 	//printf("JI:\t%f ASD:\t%f\n",100-tanimotoError,avgDistance);
 	printf("dice:\t%f ASD:\t%f\n",diceError,avgDistance);
-
 
 
  // printf( resultBuffer );
